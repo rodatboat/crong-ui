@@ -1,8 +1,19 @@
 <script lang="ts">
-	import Header from './Header.svelte';
-	import '$lib/styles/layout.css';
+	import Header from "./Header.svelte";
+	import "$lib/styles/layout.css";
+	import { auth } from "$lib/auth/auth.svelte";
+	import { onMount } from "svelte";
+	import { goto } from "$app/navigation";
 
 	let { children } = $props();
+
+	onMount(async () => {
+		await auth.initialize();
+	});
+
+	$effect(() => {
+		if (!auth.auth_token) goto("/login");
+	});
 </script>
 
 <div class="app">
@@ -11,7 +22,7 @@
 
 	<footer>
 		<p>
-			visit 
+			visit
 			<a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a>
 			to learn about SvelteKit
 		</p>

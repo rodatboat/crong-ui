@@ -1,3 +1,5 @@
+
+import { auth } from "$lib/auth/auth.svelte";
 import { API_URL } from "$lib/const";
 import type { APIResponse, User, ValidationErrors } from "$lib/types";
 
@@ -6,9 +8,7 @@ export type LoginRequest = APIResponse & {
     password: string;
 };
 
-export type LoginResponse = APIResponse<User | ValidationErrors> & {
-    auth_token?: string;
-};
+export type LoginResponse = APIResponse<User & { auth_token?: string }> | APIResponse<ValidationErrors>;
 
 export async function login(data: LoginRequest): Promise<LoginResponse> {
     const resp = await fetch(`${API_URL}/users/login`, {
@@ -43,6 +43,23 @@ export async function register(data: RegisterRequest): Promise<RegisterResponse>
             "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+    });
+    
+    return resp.json().catch(() => {
+        return {
+            status: 500,
+            message: "Failed to parse response",
+        };
+    });
+}
+
+export async function loadAuthedUser(tokenOverride?: string): Promise<APIResponse<User>> {
+    const resp = await fetch(`${API_URL}/users/me`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${auth.auth_token}`,
+        }
     });
     
     return resp.json().catch(() => {

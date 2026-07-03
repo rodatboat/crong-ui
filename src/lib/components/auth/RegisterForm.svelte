@@ -8,6 +8,8 @@
         type RegisterRequest,
         type RegisterResponse,
     } from "$lib/services/auth";
+    import { goto } from "$app/navigation";
+    import { resolve } from "$app/paths";
 
     let firstName = $state("");
     let lastName = $state("");
@@ -17,6 +19,7 @@
     let error = $state<string | undefined>("");
 
     async function handleResiger() {
+        loading = true;
         let reqData: RegisterRequest = {
             first_name: firstName,
             last_name: lastName,
@@ -24,14 +27,13 @@
             password,
         };
         const resp: RegisterResponse = await register(reqData);
-        if (resp.status != 200) {
-            error = resp.message;
-            return;
-        } else {
+        if (resp.status == 200) {
             error = undefined;
-            // TODO: Start a session...
-            // window.location.href = "/";
+            goto("/login");
+        } else {
+            error = resp.message;
         }
+        loading = false;
     }
 </script>
 
@@ -59,7 +61,7 @@
                     id="last_name"
                     type="text"
                     placeholder="Enter your last name"
-                    bind:value={email}
+                    bind:value={lastName}
                 />
             </div>
         </div>
@@ -92,8 +94,11 @@
     </Card.Content>
 
     <Card.Footer>
-        <Button class="w-full" disabled={loading} onclick={handleResiger}>
-            {loading ? "Registering..." : "Register"}
-        </Button>
+        <div class="flex flex-col w-full space-y-4 text-center">
+            <Button class="w-full" disabled={loading} onclick={handleResiger}>
+                {loading ? "Registering..." : "Register"}
+            </Button>
+            <a href={resolve("/login")}>Already have an account?</a>
+        </div>
     </Card.Footer>
 </Card.Root>

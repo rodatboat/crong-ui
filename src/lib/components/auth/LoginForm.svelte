@@ -8,6 +8,10 @@
         type LoginRequest,
         type LoginResponse,
     } from "$lib/services/auth";
+    import { auth } from "$lib/auth/auth.svelte";
+    import { type User } from "$lib/types";
+    import { goto } from "$app/navigation";
+    import { resolve } from "$app/paths";
 
     let email = $state("");
     let password = $state("");
@@ -15,19 +19,23 @@
     let error = $state<string | undefined>("");
 
     async function handleLogin() {
+        loading = true;
         let reqData: LoginRequest = {
             email,
             password,
         };
         const resp: LoginResponse = await login(reqData);
-        if (resp.status != 200) {
-            error = resp.message;
-            return;
-        } else {
+        if (resp.status == 200) {
             error = undefined;
-            // TODO: Start a session...
-            // window.location.href = "/";
+            if (!resp.data?.auth_token) return;
+            if (!resp.data) return;
+            auth.authenticate(resp.data.auth_token, resp.data as User);
+            goto("/");
+        } else {
+            error = resp.message;
         }
+        loading = false;
+        return;
     }
 </script>
 
@@ -67,8 +75,11 @@
     </Card.Content>
 
     <Card.Footer>
-        <Button class="w-full" disabled={loading} onclick={handleLogin}>
-            {loading ? "Signing In..." : "Login"}
-        </Button>
+        <div class="flex flex-col w-full space-y-4 text-center">
+            <Button class="w-full" disabled={loading} onclick={handleLogin}>
+                {loading ? "Signing In..." : "Login"}
+            </Button>
+            <a href={resolve("/register")}>Don't have an account?</a>
+        </div>
     </Card.Footer>
 </Card.Root>

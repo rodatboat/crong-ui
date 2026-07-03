@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+    import { auth } from '$lib/auth/auth.svelte';
 </script>
 
 <svelte:head>
@@ -27,4 +28,5 @@
 		The <a href={resolve('/sverdle')}>Sverdle</a> page illustrates SvelteKit's data loading and form handling.
 		Try using it with JavaScript disabled!
 	</p>
+	<button onclick={() => auth.deauth()}>logout</button>
 </div>
