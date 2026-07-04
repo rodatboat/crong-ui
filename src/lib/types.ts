@@ -59,6 +59,11 @@ export type JobExecution = {
     created_at: string;
 }
 
+export type Folder = {
+    id: number;
+    name: string;
+}
+
 export type APIResponse<T = unknown> = {
     status?: number;
     message?: string;
