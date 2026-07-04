@@ -22,8 +22,7 @@
 <Sidebar.Provider>
 	<AppSidebar />
 	<main
-		class="flex flex-col"
-		style="width: calc(100vw - var(--sidebar-width))"
+		class="flex flex-col w-screen"
 	>
 		<Header class="h-12">
 			<Sidebar.Trigger
