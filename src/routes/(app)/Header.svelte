@@ -9,7 +9,7 @@
 	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
 </script>
 
-<header class={cn("flex items-center justify-between p-2", className)}>
+<header class={cn("flex items-center justify-between p-2 h-12 bg-accent top-0 sticky", className)}>
 	<nav class="">
 		{@render children?.()}
 	</nav>

@@ -21,9 +21,14 @@
 
 <Sidebar.Provider>
 	<AppSidebar />
-	<main class="flex flex-col w-full">
+	<main
+		class="flex flex-col"
+		style="width: calc(100vw - var(--sidebar-width))"
+	>
 		<Header class="h-12">
-			<Sidebar.Trigger class="hover:cursor-pointer text-accent hover:bg-none" />
+			<Sidebar.Trigger
+				class="hover:cursor-pointer text-accent-foreground hover:bg-transparent"
+			/>
 		</Header>
 		{@render children?.()}
 	</main>

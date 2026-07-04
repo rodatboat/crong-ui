@@ -15,7 +15,7 @@
  
 <Sidebar.Root>
   <Sidebar.Content>
-    <Sidebar.Group>
+    <Sidebar.Group class="mt-12 border-t">
       <Sidebar.GroupLabel>Application</Sidebar.GroupLabel>
       <Sidebar.GroupContent>
         <Sidebar.Menu>
