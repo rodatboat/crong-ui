@@ -6,6 +6,7 @@
 	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
 	import { resolve } from "$app/paths";
+	import Header from "./Header.svelte";
 
 	let { children } = $props();
 
@@ -20,8 +21,10 @@
 
 <Sidebar.Provider>
 	<AppSidebar />
-	<main>
-		<Sidebar.Trigger class="hover:cursor-pointer" />
+	<main class="flex flex-col w-full">
+		<Header class="h-12">
+			<Sidebar.Trigger class="hover:cursor-pointer text-accent hover:bg-none" />
+		</Header>
 		{@render children?.()}
 	</main>
 </Sidebar.Provider>

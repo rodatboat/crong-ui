@@ -4,10 +4,8 @@
 	let { children } = $props();
 </script>
 
-<div class="app flex-col h-min-screen flex h-screen">
-	<main class="flex-1">
-		{@render children()}
-	</main>
+<div class="flex flex-col w-min-screen w-screen h-min-screen h-screen">
+	{@render children()}
 
 	<footer>
 		<p>
@@ -19,21 +17,4 @@
 </div>
 
 <style>
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
-	}
 </style>
