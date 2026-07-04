@@ -3,6 +3,7 @@ import { AUTH_TOKEN_KEY } from "$lib/const";
 import { LOGGER } from "$lib/logger";
 import { loadAuthedUser } from "$lib/services/auth";
 import type { APIResponse, User } from "$lib/types";
+import { resolve } from "$app/paths";
 
 class AuthState {
     auth_token = $state<string | null>(null);
@@ -24,7 +25,7 @@ class AuthState {
             } else {
                 LOGGER.info("Token invalid, clearing auth");
                 this.deauth();
-                goto("/login");
+                goto(resolve("/login"));
             }
         } else LOGGER.warn("No token found in storage");
     }

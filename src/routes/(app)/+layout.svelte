@@ -4,6 +4,7 @@
 	import { auth } from "$lib/auth/auth.svelte";
 	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
+    import { resolve } from '$app/paths';
 
 	let { children } = $props();
 
@@ -12,7 +13,7 @@
 	});
 
 	$effect(() => {
-		if (!auth.auth_token) goto("/login");
+		if (!auth.auth_token) goto(resolve("/login"));
 	});
 </script>
 
