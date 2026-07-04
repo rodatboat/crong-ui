@@ -11,7 +11,7 @@
     });
 
     $effect(() => {
-        if (!auth.auth_token) goto(resolve("/login"))
+        if (auth.initialized && !auth.auth_token) goto(resolve("/login"))
         else goto(resolve("/"))
     })
 </script>

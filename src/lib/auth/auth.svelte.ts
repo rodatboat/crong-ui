@@ -8,6 +8,7 @@ import { resolve } from "$app/paths";
 class AuthState {
     auth_token = $state<string | null>(null);
     user = $state<User | null>(null);
+    initialized = $state(false);
 
     async initialize() {
         LOGGER.debug("Auth initialize");
@@ -15,6 +16,7 @@ class AuthState {
         if (token) {
             if (this.user) {
                 LOGGER.debug("User already authenticated");
+                this.initialized = true;
                 return;
             }
             LOGGER.debug("Token found in storage, validating...", token, this.auth_token);
@@ -28,12 +30,14 @@ class AuthState {
                 goto(resolve("/login"));
             }
         } else LOGGER.warn("No token found in storage");
+        this.initialized = true;
     }
 
     authenticate(auth_token: string, user: User) {
         LOGGER.info(`User authenticated: ${user.email}`);
         this.auth_token = auth_token;
         this.user = user;
+        this.initialized = true;
         localStorage.setItem(AUTH_TOKEN_KEY, auth_token);
     }
 
