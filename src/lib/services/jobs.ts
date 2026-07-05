@@ -59,12 +59,12 @@ export async function deleteJobById(jobId: number): Promise<APIResponse<undefine
     });
 }
 
-export type CreateJobRequest = APIResponse & Omit<Job, 'id' | 'created_at' | 'updated_at' | 'last_execution'>;
-export type CreateJobResponse = APIResponse<Job | ValidationErrors>
+export type CreateJobRequest = Omit<Job, 'id' | 'created_at' | 'updated_at' | 'last_execution'>;
+export type CreateJobResponse = Job | ValidationErrors;
 
-export async function createJob(data: CreateJobRequest): Promise<CreateJobResponse> {
+export async function createJob(data: CreateJobRequest): Promise<APIResponse<CreateJobResponse>> {
     LOGGER.info(`Creating new job`);
-    return fetchAPI<CreateJobResponse>(`${API_URL}/jobs/`, {
+    return fetchAPI<APIResponse<CreateJobResponse>>(`${API_URL}/jobs/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -73,12 +73,12 @@ export async function createJob(data: CreateJobRequest): Promise<CreateJobRespon
     });
 }
 
-export type UpdateJobRequest = APIResponse & Omit<Job, 'id' | 'created_at' | 'updated_at' | 'last_execution'>;
-export type UpdateJobResponse = APIResponse<Job | ValidationErrors>
+export type UpdateJobRequest = Omit<Job, 'id' | 'created_at' | 'updated_at' | 'last_execution'>;
+export type UpdateJobResponse = Job | ValidationErrors;
 
-export async function updateJob(jobId: number, data: UpdateJobRequest): Promise<UpdateJobResponse> {
+export async function updateJob(jobId: number, data: UpdateJobRequest): Promise<APIResponse<UpdateJobResponse>> {
     LOGGER.info(`Updating existing job`);
-    return fetchAPI<UpdateJobResponse>(`${API_URL}/jobs/${jobId}`, {
+    return fetchAPI<APIResponse<UpdateJobResponse>>(`${API_URL}/jobs/${jobId}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",

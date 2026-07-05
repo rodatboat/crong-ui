@@ -37,7 +37,7 @@ export async function DeleteFolderById(folderId: number): Promise<APIResponse<un
     });
 }
 
-export type FolderJobsResponse = APIResponse<Folder & { jobs: Job[] }> | APIResponse<ValidationErrors>;
+export type FolderJobsResponse = Folder & { jobs: Job[] };
 
 export async function loadJobsByFolder(folderId: number): Promise<APIResponse<FolderJobsResponse>> {
     LOGGER.debug("Loading folder jobs by id", folderId);
@@ -50,11 +50,11 @@ export async function loadJobsByFolder(folderId: number): Promise<APIResponse<Fo
     });
 }
 
-export type CreateFolderRequest = APIResponse & Omit<Folder, 'id'>;
-export type CreateFolderResponse = APIResponse<Folder | ValidationErrors>
-export async function createFolder(data: CreateFolderRequest): Promise<CreateFolderResponse> {
+export type CreateFolderRequest = Omit<Folder, 'id'>;
+export type CreateFolderResponse = Folder | ValidationErrors
+export async function createFolder(data: CreateFolderRequest): Promise<APIResponse<CreateFolderResponse>> {
     LOGGER.info(`Creating new folder`);
-    return fetchAPI<CreateFolderResponse>(`${API_URL}/folders/`, {
+    return fetchAPI<APIResponse<CreateFolderResponse>>(`${API_URL}/folders/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -63,11 +63,11 @@ export async function createFolder(data: CreateFolderRequest): Promise<CreateFol
     });
 }
 
-export type UpdateFolderRequest = APIResponse & Omit<Folder, 'id'>;
-export type UpdateFolderResponse = APIResponse<Folder | ValidationErrors>
-export async function updateFolder(folderId: number, data: UpdateFolderRequest): Promise<UpdateFolderResponse> {
+export type UpdateFolderRequest = Omit<Folder, 'id'>;
+export type UpdateFolderResponse = Folder | ValidationErrors
+export async function updateFolder(folderId: number, data: UpdateFolderRequest): Promise<APIResponse<UpdateFolderResponse>> {
     LOGGER.info(`Updating existing folder`);
-    return fetchAPI<UpdateFolderResponse>(`${API_URL}/folders/${folderId}`, {
+    return fetchAPI<APIResponse<UpdateFolderResponse>>(`${API_URL}/folders/${folderId}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",

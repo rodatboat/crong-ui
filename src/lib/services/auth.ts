@@ -5,16 +5,16 @@ import { LOGGER } from "$lib/logger";
 import type { APIResponse, User, ValidationErrors } from "$lib/types";
 import { fetchAPI } from "$lib/utils";
 
-export type LoginRequest = APIResponse & {
+export type LoginRequest = {
     email: string;
     password: string;
 };
 
-export type LoginResponse = APIResponse<User & { auth_token?: string }> | APIResponse<ValidationErrors>;
+export type LoginResponse = User & { auth_token?: string } | ValidationErrors;
 
-export async function login(data: LoginRequest): Promise<LoginResponse> {
+export async function login(data: LoginRequest): Promise<APIResponse<LoginResponse>> {
     LOGGER.info(`Login attempt for ${data.email}`);
-    return fetchAPI<LoginResponse>(`${API_URL}/users/login`, {
+    return fetchAPI<APIResponse<LoginResponse>>(`${API_URL}/users/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -23,18 +23,18 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
     });
 }
 
-export type RegisterRequest = APIResponse & {
+export type RegisterRequest = {
     first_name: string;
     last_name?: string;
     email: string;
     password: string;
 };
 
-export type RegisterResponse = APIResponse<User | ValidationErrors>
+export type RegisterResponse = User | ValidationErrors;
 
-export async function register(data: RegisterRequest): Promise<RegisterResponse> {
+export async function register(data: RegisterRequest): Promise<APIResponse<RegisterResponse>> {
     LOGGER.info(`Register attempt for ${data.email}`);
-    return fetchAPI<RegisterResponse>(`${API_URL}/users/register`, {
+    return fetchAPI<APIResponse<RegisterResponse>>(`${API_URL}/users/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
