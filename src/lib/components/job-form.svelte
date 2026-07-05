@@ -28,11 +28,15 @@
     import { goto } from "$app/navigation";
     import { resolve } from "$app/paths";
     import JobRunButton from "$lib/components/job-run-button.svelte";
+    import { JOB_METHOD_MAP } from "$lib/const";
+    import { Separator } from "$lib/components/ui/separator";
+    import LoaderIcon from "@lucide/svelte/icons/loader-circle";
+
 
     let title = $state("");
     let url = $state("");
     let selectedFolder = $state<string | undefined>(undefined);
-    let method = $state(0);
+    let selectedMethod = $state("0");
     let body = $state("");
     let cron = $state("");
     let timezone = $state("UTC");
@@ -44,15 +48,18 @@
     let initialized = $state(false);
     let folders = $state<Folder[]>([]);
 
-    const folderId = $derived(selectedFolder ? Number(selectedFolder) : undefined);
+    const folderId = $derived(
+        selectedFolder ? Number(selectedFolder) : undefined,
+    );
+    const method = $derived(Number(selectedMethod));
 
     const jobId = $derived(page.params.jobId);
     const jobIdNum = $derived(Number(jobId));
-    const isUpdateForm: boolean = $derived(jobId !== undefined);
+    const isUpdateForm: boolean = $derived(!isNaN(jobIdNum));
 
     async function loadDefaultForm() {
         if (!jobId || initialized) return;
-        if (isNaN(jobIdNum)) return;
+        if (!isUpdateForm) return;
 
         loading = true;
 
@@ -64,7 +71,7 @@
             title = job.title;
             url = job.url;
             selectedFolder = job.folder_id ? String(job.folder_id) : undefined;
-            method = job.method;
+            selectedMethod = String(job.method);
             body = job.body ?? "";
             cron = job.cron;
             // TODO: Load headers
@@ -168,6 +175,12 @@
     $effect(() => {
         if (!auth.auth_token) return;
 
+        // If there's a jobId, but we can't find the job. 
+        // isUpdateForm (bool) will be false since it can't find the job to update.
+        if (jobId && !isUpdateForm) {
+            goto(resolve("/jobs"));
+        }
+
         // Load folders on init
         if (folders.length === 0) {
             loadFolders().then((resp) => {
@@ -179,7 +192,7 @@
             });
         }
 
-        if (jobId) {
+        if (jobId && isUpdateForm) {
             loadDefaultForm();
         }
     });
@@ -193,6 +206,11 @@
         >
     </Card.Header>
 
+    {#if !initialized}
+    <div class="flex gap-2 items-center justify-center h-full min-h-175 md:min-w-xl">
+        <LoaderIcon class="animate-spin text-accent" />
+    </div>
+    {:else}
     <Card.Content class="space-y-4 md:min-w-xl">
         <div class="space-y-2">
             <Label for="title">Job Title</Label>
@@ -224,19 +242,19 @@
 
         <div class="space-y-2">
             <Label for="folderId">Folder (Optional)</Label>
-            <Select.Root
-                type="single"
-                bind:value={selectedFolder}
-            >
+            <Select.Root type="single" bind:value={selectedFolder}>
                 <Select.Trigger class="w-full">
                     {folderId
-                        ? folders.find((f) => f.id === folderId)?.name ?? "Select folder"
+                        ? (folders.find((f) => f.id === folderId)?.name ??
+                          "Select folder")
                         : "No folder"}
                 </Select.Trigger>
                 <Select.Content>
                     <Select.Item value="">No folder</Select.Item>
                     {#each folders as folder (folder.id)}
-                        <Select.Item value={String(folder.id)}>{folder.name}</Select.Item>
+                        <Select.Item value={String(folder.id)}
+                            >{folder.name}</Select.Item
+                        >
                     {/each}
                 </Select.Content>
             </Select.Root>
@@ -249,30 +267,20 @@
 
         <div class="space-y-2">
             <Label for="method">HTTP Method</Label>
-            <Input
-                id="method"
-                type="number"
-                placeholder="0 = GET, 1 = POST, 2 = PUT, 3 = DELETE"
-                bind:value={method}
-                required
-            />
+            <Select.Root type="single" bind:value={selectedMethod}>
+                <Select.Trigger class="w-full">
+                    {JOB_METHOD_MAP.get(method) ?? "Select method"}
+                </Select.Trigger>
+                <Select.Content>
+                    {#each Array.from(JOB_METHOD_MAP.entries()) as [key, value] (key)}
+                        <Select.Item value={String(key)}>{value}</Select.Item>
+                    {/each}
+                </Select.Content>
+            </Select.Root>
             {#if validationErrors.method}
                 <p class="text-destructive text-xs">
                     {validationErrors.method}
                 </p>
-            {/if}
-        </div>
-
-        <div class="space-y-2">
-            <Label for="body">Request Body (JSON)</Label>
-            <textarea
-                id="body"
-                class="w-full min-h-24 px-3 py-2 border border-input rounded-md"
-                placeholder={`{ "action": "test" }`}
-                bind:value={body}
-            ></textarea>
-            {#if validationErrors.body}
-                <p class="text-destructive text-xs">{validationErrors.body}</p>
             {/if}
         </div>
 
@@ -287,6 +295,55 @@
             />
             {#if validationErrors.cron}
                 <p class="text-destructive text-xs">{validationErrors.cron}</p>
+            {/if}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2">
+                <Label for="timeout">Timeout (seconds)</Label>
+                <Input
+                    id="timeout"
+                    type="number"
+                    placeholder="15"
+                    bind:value={timeout}
+                    min="1"
+                    max="30"
+                    required
+                />
+                {#if validationErrors.timeout}
+                    <p class="text-destructive text-xs">
+                        {validationErrors.timeout}
+                    </p>
+                {/if}
+            </div>
+
+            <div class="space-y-2 flex items-center gap-2 mt-5">
+                <input
+                    id="enabled"
+                    type="checkbox"
+                    class="my-auto"
+                    bind:checked={enabled}
+                />
+                <Label for="enabled">Enabled</Label>
+            </div>
+        </div>
+
+        <Separator class="my-4" />
+        <Card.Header class="px-0">
+            <Card.Title>Advanced</Card.Title>
+            <Card.Description>Advanced options</Card.Description>
+        </Card.Header>
+
+        <div class="space-y-2">
+            <Label for="body">Request Body (JSON)</Label>
+            <textarea
+                id="body"
+                class="w-full min-h-24 px-3 py-2 border border-input rounded-md"
+                placeholder={`{ "action": "test" }`}
+                bind:value={body}
+            ></textarea>
+            {#if validationErrors.body}
+                <p class="text-destructive text-xs">{validationErrors.body}</p>
             {/if}
         </div>
 
@@ -306,31 +363,11 @@
             {/if}
         </div>
 
-        <div class="space-y-2">
-            <Label for="timeout">Timeout (seconds)</Label>
-            <Input
-                id="timeout"
-                type="number"
-                placeholder="30"
-                bind:value={timeout}
-                required
-            />
-            {#if validationErrors.timeout}
-                <p class="text-destructive text-xs">
-                    {validationErrors.timeout}
-                </p>
-            {/if}
-        </div>
-
-        <div class="space-y-2 flex items-center gap-2">
-            <input id="enabled" type="checkbox" bind:checked={enabled} />
-            <Label for="enabled">Enabled</Label>
-        </div>
-
         {#if error}
             <p class="text-destructive text-xs">{error}</p>
         {/if}
     </Card.Content>
+    {/if}
 
     <Card.Footer>
         <div class="flex flex-row w-full gap-2 text-center">

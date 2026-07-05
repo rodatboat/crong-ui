@@ -11,13 +11,14 @@
 
 
     let { jobs, loading }: { jobs: Job[]; loading: boolean } = $props();
+    const sortedJobs = $derived.by(() => [...jobs].sort((a, b) => a.id - b.id));
 
 </script>
 
 <section class="items-center gap-6 pb-8 pt-6 md:py-10">
-    <div class="flex flex-col gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4">
         {#if !loading}
-            {#each jobs as job (job.id)}
+            {#each sortedJobs as job (job.id)}
                 <Card.Root>
                     <Card.Header>
                         <Card.Title

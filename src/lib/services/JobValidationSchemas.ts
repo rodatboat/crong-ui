@@ -14,15 +14,15 @@ export const jobHeadersSchema = z.array(
 );
 
 export const jobSchema = z.object({
-    title: z.string().min(1, "Title is required"),
-    url: z.string().url("Must be a valid URL"),
+    title: z.string().min(1, "Title is required").max(255, "Title must be at most 255 characters"),
+    url: z.string().min(1, "URL is required").max(2048, "URL must be at most 2048 characters").url("Must be a valid URL"),
     folder_id: z.number().optional(),
-    method: z.number().int("Method must be a number"),
+    method: z.number().min(0, "Method is invalid").int("Method must be a number"),
     headers: jobHeadersSchema.optional().default([]),
     auth: jobAuthSchema.optional().default({ enabled: false, username: "", password: "" }),
-    body: z.string().optional().default(""),
-    cron: z.string().min(1, "Cron expression is required"),
+    body: z.string().max(10000, "Body must be at most 10000 characters").optional().default(""),
+    cron: z.string().min(1, "Cron expression is required").max(100, "Cron expression must be at most 100 characters"),
     timezone: z.string().min(1, "Timezone is required"),
-    timeout: z.number().int().min(1, "Timeout must be at least 1"),
+    timeout: z.number().int().min(0, "Timeout must be at least 0").max(30, "Timeout must be at most 30"),
     enabled: z.boolean().default(true),
 });

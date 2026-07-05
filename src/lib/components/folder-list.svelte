@@ -9,12 +9,13 @@
 
     let { folders, loading }: { folders: Folder[]; loading: boolean } =
         $props();
+    const sortedFolders = $derived.by(() => [...folders].sort((a, b) => a.id - b.id));
 </script>
 
 <section class="items-center gap-6 pb-8 pt-6 md:py-10">
     <div class="flex flex-col gap-4">
         {#if !loading}
-            {#each folders as folder (folder.id)}
+            {#each sortedFolders as folder (folder.id)}
                 <Card.Root>
                     <Card.Header>
                         <Card.Title>
