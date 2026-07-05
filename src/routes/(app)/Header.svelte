@@ -24,7 +24,7 @@
 			{auth.user?.first_name}{auth.user?.last_name ? `, ${auth.user?.last_name}` : ""}
 		</span>
 		<Button
-		variant="link"
+			variant="link"
 			class="min-w-24 hover:cursor-pointer hover:bg-accent text-accent-foreground"
 			disabled={!auth.initialized}
 			onclick={() => auth.deauth()}

@@ -4,7 +4,7 @@
 	let { children } = $props();
 </script>
 
-<div class="flex flex-col w-min-screen w-screen h-min-screen h-screen">
+<div class="w-screen max-w-screen h-screen">
 	{@render children()}
 </div>
 

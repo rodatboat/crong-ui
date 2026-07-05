@@ -19,10 +19,10 @@
 	});
 </script>
 
-<Sidebar.Provider>
+<Sidebar.Provider class="max-w-screen w-screen">
 	<AppSidebar />
 	<main
-		class="flex flex-col w-screen"
+		class="flex-1 flex flex-col"
 	>
 		<Header class="h-12">
 			<Sidebar.Trigger

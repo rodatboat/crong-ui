@@ -142,7 +142,7 @@
 
     <Card.Footer>
         <div class="flex flex-col w-full space-y-4 text-center">
-            <Button class="w-full" disabled={loading} onclick={handleResiger}>
+            <Button class="w-full hover:cursor-pointer" disabled={loading} onclick={handleResiger}>
                 {loading ? "Registering..." : "Register"}
             </Button>
             <a href={resolve("/login")}>Already have an account?</a>

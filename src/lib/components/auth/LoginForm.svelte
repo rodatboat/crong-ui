@@ -91,7 +91,7 @@
 
     <Card.Footer>
         <div class="flex flex-col w-full space-y-4 text-center">
-            <Button class="w-full" disabled={loading} onclick={handleLogin}>
+            <Button class="w-full hover:cursor-pointer" disabled={loading} onclick={handleLogin}>
                 {loading ? "Signing In..." : "Login"}
             </Button>
             <a href={resolve("/register")}>Don't have an account?</a>
