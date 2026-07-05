@@ -9,7 +9,7 @@
         type LoginResponse,
     } from "$lib/services/auth";
     import { auth } from "$lib/auth/auth.svelte";
-    import { type User, type ValidationErrors } from "$lib/types";
+    import { type APIResponse, type User, type ValidationErrors } from "$lib/types";
     import { goto } from "$app/navigation";
     import { resolve } from "$app/paths";
     import { loginSchema } from "$lib/auth/AuthValidationSchemas";
@@ -33,7 +33,7 @@
             return;
         }
 
-        const resp: LoginResponse = await login(reqData);
+        const resp: APIResponse<LoginResponse> = await login(reqData);
         if (resp.status == 200) {
             error = undefined;
             if (resp.data?.auth_token && resp.data) {

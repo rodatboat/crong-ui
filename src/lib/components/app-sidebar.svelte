@@ -14,14 +14,14 @@
       icon: DashboardIcon,
     },
     {
-      title: "Folders",
-      url: "/jobs/folders",
-      icon: FolderIcon,
-    },
-    {
       title: "Jobs",
       url: "/jobs",
       icon: TimerIcon,
+    },
+    {
+      title: "Folders",
+      url: "/jobs/folders",
+      icon: FolderIcon,
     },
   ] as const;
 </script>
@@ -31,9 +31,8 @@
     <Sidebar.Separator />
 
     <Sidebar.Group class="mt-12 space-y-2">
-      <Sidebar.GroupLabel class="font-bold text-base"
-        >Application</Sidebar.GroupLabel
-      >
+      <!-- <Sidebar.GroupLabel class="font-bold text-base">Application</Sidebar.GroupLabel> -->
+      <Sidebar.Separator class="mx-0" />
       <Sidebar.GroupContent>
         <Sidebar.Menu class="space-y-2">
           {#each items as item (item.title)}
@@ -48,7 +47,7 @@
               </Sidebar.MenuButton>
             </Sidebar.MenuItem>
           {/each}
-          <Sidebar.Separator />
+          <Sidebar.Separator class="mx-0" />
           <Sidebar.MenuItem>
             <Sidebar.MenuButton class="text-base">
               {#snippet child({ props })}

@@ -58,6 +58,7 @@ export async function createFolder(data: CreateFolderRequest): Promise<APIRespon
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${auth.auth_token}`,
         },
         body: JSON.stringify(data),
     });
@@ -71,6 +72,7 @@ export async function updateFolder(folderId: number, data: UpdateFolderRequest):
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${auth.auth_token}`,
         },
         body: JSON.stringify(data),
     });

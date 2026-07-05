@@ -68,6 +68,7 @@ export async function createJob(data: CreateJobRequest): Promise<APIResponse<Cre
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${auth.auth_token}`,
         },
         body: JSON.stringify(data),
     });
@@ -82,6 +83,7 @@ export async function updateJob(jobId: number, data: UpdateJobRequest): Promise<
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${auth.auth_token}`,
         },
         body: JSON.stringify(data),
     });

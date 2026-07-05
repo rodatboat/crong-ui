@@ -4,15 +4,14 @@
     import { Skeleton } from "$lib/components/ui/skeleton";
     import { JOB_METHOD_MAP } from "$lib/const";
     import type { Job } from "$lib/types";
-    import PlayIcon from "@lucide/svelte/icons/play";
     import EditIcon from "@lucide/svelte/icons/edit";
     import HistoryIcon from "@lucide/svelte/icons/history";
-    import LoaderIcon from "@lucide/svelte/icons/loader-circle";
-    import { triggerJob } from "$lib/services/jobs";
+    import JobRunButton from "$lib/components/job-run-button.svelte";
     import { resolve } from "$app/paths";
 
+
     let { jobs, loading }: { jobs: Job[]; loading: boolean } = $props();
-    let runningJob: boolean = $state(false);
+
 </script>
 
 <section class="items-center gap-6 pb-8 pt-6 md:py-10">
@@ -55,22 +54,10 @@
                             href={`/jobs/${job.id}`}
                             ><EditIcon class="size-3" /> Edit</Button
                         >
-                        <Button
-                            variant="default"
-                            class="md:order-3 order-1 w-16 hover:cursor-pointer"
-                            onclick={async () => {
-                                runningJob = true;
-                                await triggerJob(job.id);
-                                runningJob = false;
-                            }}
-                        >
-                            {#if runningJob}
-                                <LoaderIcon class="size-3 animate-spin" />
-                            {:else}
-                                <PlayIcon class="size-3" />
-                                Run
-                            {/if}
-                        </Button>
+                        <JobRunButton
+                            jobId={job.id}
+                            class="md:order-3 order-1 w-16"
+                        />
                     </Card.Footer>
                 </Card.Root>
             {/each}

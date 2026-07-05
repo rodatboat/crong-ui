@@ -8,7 +8,7 @@
         type RegisterRequest,
         type RegisterResponse,
     } from "$lib/services/auth";
-    import { type ValidationErrors } from "$lib/types";
+    import { type APIResponse, type ValidationErrors } from "$lib/types";
     import { goto } from "$app/navigation";
     import { resolve } from "$app/paths";
     import { registerSchema } from "$lib/auth/AuthValidationSchemas";
@@ -47,7 +47,7 @@
             email,
             password,
         };
-        const resp: RegisterResponse = await register(reqData);
+        const resp: APIResponse<RegisterResponse> = await register(reqData);
         if (resp.status == 200) {
             error = undefined;
             goto(resolve("/login"));
