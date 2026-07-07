@@ -4,6 +4,7 @@
     import { Input } from "$lib/components/ui/input";
     import { Button } from "$lib/components/ui/button";
     import * as Select from "$lib/components/ui/select";
+    import JobHeadersInput from "$lib/components/job-headers.svelte";
     import {
         createJob,
         loadJobById,
@@ -170,6 +171,8 @@
         if (jobId) {
             if (!isUpdateForm) goto(resolve("/jobs"));
             else loadDefaultForm();
+        } else {
+            initialized = true;
         }
     });
 
@@ -342,6 +345,8 @@
                 <Card.Title>Advanced</Card.Title>
                 <Card.Description>Advanced options</Card.Description>
             </Card.Header>
+
+            <JobHeadersInput bind:headers={formData.headers} />
 
             <div class="space-y-2">
                 <Label for="body">Request Body (JSON)</Label>
