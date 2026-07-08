@@ -17,6 +17,9 @@
 </script>
 
 <div class="space-y-2">
+    {#if headers.length === 0}
+    <p class="text-muted-foreground text-xs">No headers specified.</p>
+    {/if}
     {#each headers as header, i (i)}
         <div class="flex gap-2">
             <Input

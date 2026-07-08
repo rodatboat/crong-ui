@@ -366,6 +366,40 @@
             </div>
 
             <div class="space-y-2">
+                <Label for="headers">HTTP Authentication</Label>
+                <Input
+                    type="text"
+                    name="auth.username"
+                    placeholder="Username"
+                    bind:value={formData.auth.username}
+                    disabled={!formData.auth.enabled}
+                />
+
+                <Input
+                    type="password"
+                    name="auth.password"
+                    placeholder="Password"
+                    bind:value={formData.auth.password}
+                    disabled={!formData.auth.enabled}
+                />
+                {#if validationErrors.headers}
+                    <p class="text-destructive text-xs">
+                        {validationErrors.headers}
+                    </p>
+                {/if}
+
+                <div class="flex items-center justify-end gap-2">
+                    <input
+                        id="auth.enabled"
+                        type="checkbox"
+                        class="my-auto"
+                        bind:checked={formData.auth.enabled}
+                    />
+                    <Label for="enabled">Enabled</Label>
+                </div>
+            </div>
+
+            <div class="space-y-2">
                 <Label for="body">Request Body</Label>
                 <textarea
                     id="body"
