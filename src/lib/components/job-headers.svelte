@@ -15,8 +15,8 @@
 </script>
 
 <div class="space-y-2">
-    <Label for="body">Headers</Label>
-    {#each headers as header, i (header.name)}
+    <Label for="headers">Headers</Label>
+    {#each headers as header, i (header.key + i)}
         <div class="flex gap-2">
             <Input placeholder="Header" bind:value={header.key} />
 
