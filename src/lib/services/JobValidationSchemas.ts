@@ -1,3 +1,4 @@
+import { LOGGER } from "$lib/logger";
 import { z } from "zod";
 
 export const jobAuthSchema = z.object({
@@ -10,8 +11,26 @@ export const jobHeadersSchema = z.array(
     z.object({
         key: z.string().min(1, "Header key is required"),
         value: z.string(),
-    })
-);
+    })).superRefine((headers, ctx) => {
+        const seen = new Map<string, number>();
+
+        headers.forEach((header, index) => {
+            const key = header.key.trim().toLowerCase();
+
+            if (!key) return;
+
+            if (seen.has(key)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: [],
+                    message: "Header names must be unique."
+                });
+            } else {
+                seen.set(key, index);
+            }
+        });
+        LOGGER.warn("Schema validation error(s): ", ctx);
+    });
 
 export const jobSchema = z.object({
     title: z.string().min(1, "Title is required").max(255, "Title must be at most 255 characters"),

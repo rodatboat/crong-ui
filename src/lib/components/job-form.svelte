@@ -100,7 +100,11 @@
                 body: job.body ?? "",
                 cron: job.cron,
                 headers: job.headers ?? [],
-                auth: job.auth ?? { enabled: false, username: "", password: "" },
+                auth: job.auth ?? {
+                    enabled: false,
+                    username: "",
+                    password: "",
+                },
 
                 timezone: job.timezone ?? "UTC",
                 timeout: job.timeout ?? 30,
@@ -125,13 +129,14 @@
 
         validationErrors = validateForm(jobSchema, formData);
         if (Object.keys(validationErrors).length > 0) {
-            LOGGER.error("Validation error", Object.entries(validationErrors));
+            LOGGER.error("Validation error", validationErrors);
             loading = false;
             return;
         }
 
-        const resp: APIResponse<CreateJobResponse> =
-            await createJob(formData as CreateJobRequest);
+        const resp: APIResponse<CreateJobResponse> = await createJob(
+            formData as CreateJobRequest,
+        );
         if (resp.status == 200) {
             error = undefined;
             const jobCreated: Job = resp.data as Job;
@@ -158,6 +163,9 @@
         );
         if (resp.status == 200) {
             error = undefined;
+        } else if (resp.status == 400) {
+            if (resp.data) validationErrors = resp.data as ValidationErrors;
+            error = resp.message;
         } else {
             error = resp.message;
         }
@@ -195,7 +203,8 @@
     });
 
     $effect(() => {
-        if (!selectedFolder || selectedFolder === "") formData.folder_id = undefined;
+        if (!selectedFolder || selectedFolder === "")
+            formData.folder_id = undefined;
         else formData.folder_id = Number(selectedFolder);
     });
 </script>
@@ -253,8 +262,8 @@
                 <Select.Root type="single" bind:value={selectedFolder}>
                     <Select.Trigger class="w-full">
                         {formData.folder_id
-                            ? (folders.find((f) => f.id === formData.folder_id)?.name ??
-                              "Select folder")
+                            ? (folders.find((f) => f.id === formData.folder_id)
+                                  ?.name ?? "Select folder")
                             : "No folder"}
                     </Select.Trigger>
                     <Select.Content>
@@ -346,13 +355,21 @@
                 <Card.Description>Advanced options</Card.Description>
             </Card.Header>
 
-            <JobHeadersInput bind:headers={formData.headers} />
+            <div class="space-y-2">
+                <Label for="headers">Headers</Label>
+                <JobHeadersInput bind:headers={formData.headers} />
+                {#if validationErrors.headers}
+                    <p class="text-destructive text-xs">
+                        {validationErrors.headers}
+                    </p>
+                {/if}
+            </div>
 
             <div class="space-y-2">
-                <Label for="body">Request Body (JSON)</Label>
+                <Label for="body">Request Body</Label>
                 <textarea
                     id="body"
-                    class="w-full min-h-24 px-3 py-2 border border-input rounded-md"
+                    class="w-full min-h-24 px-3 py-2 border border-input rounded-md text-xs"
                     placeholder={`{ "action": "test" }`}
                     bind:value={formData.body}
                 ></textarea>

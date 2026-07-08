@@ -1,9 +1,11 @@
 <script lang="ts">
     import Input from "$lib/components/ui/input/input.svelte";
     import Button from "$lib/components/ui/button/button.svelte";
-    import Label from "$lib/components/ui/label/label.svelte";
+    import TrashIcon from "@lucide/svelte/icons/trash";
+    import SquarePlusIcon from "@lucide/svelte/icons/square-plus";
+    import type { JobHeaders } from "$lib/types";
 
-    let { headers = $bindable() } = $props();
+    let { headers = $bindable<JobHeaders[]>() } = $props();
 
     function addHeader() {
         headers = [...headers, { key: "", value: "" }];
@@ -15,19 +17,39 @@
 </script>
 
 <div class="space-y-2">
-    <Label for="headers">Headers</Label>
-    {#each headers as header, i (header.key + i)}
+    {#each headers as header, i (i)}
         <div class="flex gap-2">
-            <Input placeholder="Header" bind:value={header.key} />
+            <Input
+                placeholder="Key"
+                value={header.key}
+                onchange={(e) => {
+                    headers[i].key = e.currentTarget.value;
+                }}
+            />
 
-            <Input placeholder="Value" bind:value={header.value} />
+            <Input
+                placeholder="Value"
+                value={header.value}
+                onchange={(e) => {
+                    headers[i].value = e.currentTarget.value;
+                }}
+            />
 
-            <Button onclick={() => removeHeader(i)} class="hover:cursor-pointer"
-                >Delete</Button
+            <Button
+                variant="destructive"
+                onclick={() => removeHeader(i)}
+                class="hover:cursor-pointer"
+                ><TrashIcon class="size-3" /></Button
             >
         </div>
     {/each}
 
-    <Button variant="secondary" onclick={addHeader} class="mt-2 hover:cursor-pointer">Add Entry</Button
-    >
+    <div class="flex justify-end w-full">
+        <Button
+            variant="default"
+            onclick={addHeader}
+            class="hover:cursor-pointer"
+            ><SquarePlusIcon class="size-3" /></Button
+        >
+    </div>
 </div>
