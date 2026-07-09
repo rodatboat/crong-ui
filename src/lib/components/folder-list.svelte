@@ -12,8 +12,9 @@
     const sortedFolders = $derived.by(() => [...folders].sort((a, b) => a.id - b.id));
 </script>
 
+
 <section class="items-center gap-6 pb-8 pt-6 md:py-10">
-    <div class="flex flex-col gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4">
         {#if !loading}
             {#each sortedFolders as folder (folder.id)}
                 <Card.Root>

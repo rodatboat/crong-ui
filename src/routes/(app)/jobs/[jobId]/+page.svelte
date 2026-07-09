@@ -4,6 +4,6 @@
 
 </script>
 
-<div class="flex items-center justify-center bg-muted/30 p-6 h-full">
+<div class="bg-muted/30 p-2 md:p-12 lg:px-24">
     <JobForm />
 </div>

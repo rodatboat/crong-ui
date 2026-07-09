@@ -209,7 +209,7 @@
     });
 </script>
 
-<Card.Root>
+<Card.Root class="max-w-lg mx-auto">
     <Card.Header>
         <Card.Title>{isUpdateForm ? "Update" : "Create"} Job</Card.Title>
         <Card.Description
@@ -219,12 +219,12 @@
 
     {#if !initialized}
         <div
-            class="flex gap-2 items-center justify-center h-full min-h-175 md:min-w-xl"
+            class="flex gap-2 items-center justify-center h-full min-h-175"
         >
             <LoaderIcon class="animate-spin text-accent" />
         </div>
     {:else}
-        <Card.Content class="space-y-4 md:min-w-xl">
+        <Card.Content class="space-y-4">
             <div class="space-y-2">
                 <Label for="title">Job Title</Label>
                 <Input

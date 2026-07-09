@@ -4,8 +4,9 @@ import { LOGGER } from "$lib/logger";
 import { loadAuthedUser } from "$lib/services/auth";
 import type { APIResponse, User } from "$lib/types";
 import { resolve } from "$app/paths";
+import { folders } from "$lib/states/folders.svelte";
 
-class AuthState {
+export class AuthState {
     auth_token = $state<string | null>(null);
     user = $state<User | null>(null);
     initialized = $state(false);
@@ -24,6 +25,7 @@ class AuthState {
             if (resp.status == 200 && resp.data) {
                 LOGGER.info("Token valid, authenticating");
                 this.authenticate(token, resp.data);
+                folders.initialize(this);
             } else {
                 LOGGER.info("Token invalid, clearing auth");
                 this.deauth();

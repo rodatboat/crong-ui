@@ -19,7 +19,7 @@
 	});
 </script>
 
-<Sidebar.Provider class="max-w-screen w-screen max-h-screen overflow-x-hidden overflow-y-scroll">
+<Sidebar.Provider class="max-w-screen w-screen max-h-screen overflow-x-hidden scrollbar-hidden">
 	<AppSidebar />
 	<main
 		class="flex-1 flex flex-col"

@@ -151,3 +151,12 @@ body {
 		@apply font-mono;
 	}
 }
+
+@utility scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
