@@ -3,7 +3,7 @@ import { loadFolders as fetchFolders } from "$lib/services/folders";
 import type { APIResponse, Folder } from "$lib/types";
 import type { AuthState } from "$lib/auth/auth.svelte";
 
-class FoldersState {
+class FolderState {
     folders = $state<Map<number, Folder>>(new Map());
     initialized = $state(false);
 
@@ -29,4 +29,4 @@ class FoldersState {
     }
 }
 
-export const folders = new FoldersState();
+export const folders = new FolderState();

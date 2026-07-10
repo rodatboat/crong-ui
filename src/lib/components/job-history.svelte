@@ -2,33 +2,76 @@
     import * as Pagination from "$lib/components/ui/pagination/index.js";
     import * as Card from "$lib/components/ui/card";
     import { Skeleton } from "$lib/components/ui/skeleton";
-    import type { JobExecution } from "$lib/types";
+    import type { APIResponse, JobExecution } from "$lib/types";
     import { page } from "$app/state";
     // import { goto } from "$app/navigation";
-    // import { resolve } from "$app/paths";
+    import { LOGGER } from "$lib/logger";
+    import { auth } from "$lib/auth/auth.svelte";
+    import { loadJobExecutions } from "$lib/services/jobs";
 
     interface Props {
-        jobExecutions: JobExecution[];
-        loading: boolean;
-        error?: string;
-        currentPage: number;
-        perPage: number;
+        jobId: string;
     }
 
-    const { jobExecutions, loading, error, currentPage, perPage }: Props = $props();
+    const { jobId }: Props = $props();
+
+    let jobExecutions = $state<JobExecution[]>([]);
+    let loading = $state<boolean>(true);
+    let error = $state<string | undefined>();
+
+    const jobIdNum = $derived(Number(jobId));
+    const pageNum = $derived(Number(page.url.searchParams.get("page")) || 1);
+    const limit = $derived(Number(page.url.searchParams.get("limit")) || 10);
 
     // For now, estimate total count. In a real app, the API should return this
-    const totalCount = $derived(jobExecutions.length > 0 ? Math.max(currentPage * perPage + 1, currentPage * perPage + jobExecutions.length) : 0);
+    const totalCount = $derived(
+        jobExecutions.length > 0
+            ? Math.max(
+                  pageNum * limit + 1,
+                  pageNum * limit + jobExecutions.length,
+              ) : 0,
+    );
+
+    async function load() {
+        if (!jobId || !jobIdNum) return;
+
+        loading = true;
+        try {
+            const resp: APIResponse<JobExecution[]> = await loadJobExecutions(
+                jobIdNum,
+                pageNum,
+                limit,
+            );
+
+            if (resp.status === 200 && resp.data) {
+                jobExecutions = resp.data;
+                error = undefined;
+            } else {
+                error = resp.message || "Failed to load job executions";
+                LOGGER.error("Failed to load job executions", error);
+            }
+        } catch (err) {
+            error = "An error occurred while loading executions";
+            LOGGER.error("Error loading executions", err);
+        } finally {
+            loading = false;
+        }
+    }
 
     async function handlePageChange(newPage: number) {
         const url = new URL(page.url);
         url.searchParams.set("page", String(newPage));
-        url.searchParams.set("limit", String(perPage));
-        // await goto(resolve(url.toString()));
+        url.searchParams.set("limit", String(limit));
+        // await goto(url.toString());
     }
+
+    $effect(() => {
+        if (!auth.initialized) return;
+        load();
+    });
 </script>
 
-<section class="pb-8 pt-6 md:py-10">
+<section class="items-center gap-6 pb-8 pt-6 md:py-10">
     {#if error}
         <div class="text-destructive">
             {error}
@@ -48,24 +91,29 @@
     {:else}
         <div class="space-y-4">
             {#each jobExecutions as execution (execution.id)}
-                <Card.Root class="p-4">
-                    <Card.Header class="pb-2">
-                        <Card.Title class="text-base">
-                            {new Date(execution.executed_at || execution.created_at).toLocaleString()}
+                <Card.Root>
+                    <Card.Header>
+                        <Card.Title>
+                            {new Date(
+                                execution.executed_at || execution.created_at,
+                            ).toLocaleString()}
                         </Card.Title>
                         <Card.Description>
-                            Status: {execution.status_text} ({execution.status_code}) • Duration: {execution.duration_ms}ms
+                            Status: {execution.status_text} ({execution.status_code})
+                            • Duration: {execution.duration_ms}ms
                         </Card.Description>
                     </Card.Header>
                 </Card.Root>
             {/each}
 
-            <Pagination.Root {totalCount} perPage={perPage}>
+            <Pagination.Root count={totalCount} perPage={limit}>
                 {#snippet children({ pages, currentPage: activePage })}
                     <Pagination.Content>
                         <Pagination.Item>
-                            <Pagination.Previous 
-                                onclick={() => activePage > 1 && handlePageChange(activePage - 1)}
+                            <Pagination.Previous
+                                onclick={() =>
+                                    activePage > 1 &&
+                                    handlePageChange(activePage - 1)}
                                 disabled={activePage === 1}
                             />
                         </Pagination.Item>
@@ -79,7 +127,8 @@
                                     <Pagination.Link
                                         page={pageItem}
                                         isActive={activePage === pageItem.value}
-                                        onclick={() => handlePageChange(pageItem.value)}
+                                        onclick={() =>
+                                            handlePageChange(pageItem.value)}
                                     >
                                         {pageItem.value}
                                     </Pagination.Link>
@@ -87,7 +136,7 @@
                             {/if}
                         {/each}
                         <Pagination.Item>
-                            <Pagination.Next 
+                            <Pagination.Next
                                 onclick={() => handlePageChange(activePage + 1)}
                             />
                         </Pagination.Item>

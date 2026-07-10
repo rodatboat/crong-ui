@@ -24,7 +24,7 @@
         <h1 class="text-2xl">Jobs</h1>
         <Button
             class="w-min hover:cursor-pointer order-2"
-            href="/jobs/new"><ClockPlusIcon class="size-3" /> New</Button>
+            href="/jobs/new"><ClockPlusIcon class="size-3" /> New job</Button>
     </div>
     <JobList {jobs} {loading} />
 </section>

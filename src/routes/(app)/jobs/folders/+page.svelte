@@ -2,7 +2,7 @@
     import { auth } from "$lib/auth/auth.svelte";
     import FolderList from "$lib/components/folder-list.svelte";
     import Button from "$lib/components/ui/button/button.svelte";
-    import SquarePlusIcon from "@lucide/svelte/icons/square-plus";
+    import FolderPlusIcon from "@lucide/svelte/icons/folder-plus";
     import { loadFolders } from "$lib/services/folders";
     import type { Folder } from "$lib/types";
 
@@ -24,7 +24,7 @@
         <h1 class="text-2xl">Folders</h1>
         <Button
             class="w-min hover:cursor-pointer order-2"
-            href="/folders/new"><SquarePlusIcon class="size-3" /> New</Button
+            href="/folders/new"><FolderPlusIcon class="size-3" /> New folder</Button
         >
     </div>
     <FolderList {folders} {loading} />
