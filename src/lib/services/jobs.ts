@@ -37,9 +37,9 @@ export async function triggerJob(jobId: number): Promise<APIResponse<undefined>>
     });
 }
 
-export async function loadJobExecutions(jobId: number): Promise<APIResponse<JobExecution[]>> {
+export async function loadJobExecutions(jobId: number, page: number = 1, limit: number = 10): Promise<APIResponse<JobExecution[]>> {
     LOGGER.debug("Loading job executions", jobId);
-    return fetchAPI<APIResponse<JobExecution[]>>(`${API_URL}/jobs/${jobId}/executions`, {
+    return fetchAPI<APIResponse<JobExecution[]>>(`${API_URL}/jobs/${jobId}/executions?page=${page}&limit=${limit}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
