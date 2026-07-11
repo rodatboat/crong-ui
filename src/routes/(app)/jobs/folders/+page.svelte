@@ -5,15 +5,17 @@
     import FolderPlusIcon from "@lucide/svelte/icons/folder-plus";
     import { loadFolders } from "$lib/services/folders";
     import type { Folder } from "$lib/types";
+    import { folders } from "$lib/states/folders.svelte";
 
-    let folders = $state<Folder[]>([]);
+    let foldersList = $state<Folder[]>([]);
     let loading = $state<boolean>(true);
 
     $effect(() => {
         if (!auth.auth_token) return;
         loadFolders().then(({ data }) => {
             if (!data) return;
-            folders = data;
+            foldersList = data;
+            folders.updateFolders(foldersList);
             loading = false;
         });
     });
@@ -27,5 +29,5 @@
             href="/folders/new"><FolderPlusIcon class="size-3" /> New folder</Button
         >
     </div>
-    <FolderList {folders} {loading} />
+    <FolderList folders={foldersList} {loading} />
 </section>

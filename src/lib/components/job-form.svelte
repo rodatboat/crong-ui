@@ -7,18 +7,15 @@
     import JobHeadersInput from "$lib/components/job-headers.svelte";
     import {
         createJob,
-        loadJobById,
         updateJob,
         type CreateJobRequest,
         type CreateJobResponse,
         type UpdateJobRequest,
         type UpdateJobResponse,
     } from "$lib/services/jobs";
-    import { loadFolders } from "$lib/services/folders";
     import {
         type APIResponse,
         type Job,
-        type Folder,
         type ValidationErrors,
         type JobAuth,
         type JobHeaders,
@@ -28,12 +25,14 @@
     import { validateForm } from "$lib/utils";
     import { page } from "$app/state";
     import { auth } from "$lib/auth/auth.svelte";
+    import { activeJob } from "$lib/states/job.svelte";
     import { goto } from "$app/navigation";
     import { resolve } from "$app/paths";
     import JobRunButton from "$lib/components/job-run-button.svelte";
     import { JOB_METHOD_MAP } from "$lib/const";
     import { Separator } from "$lib/components/ui/separator";
     import LoaderIcon from "@lucide/svelte/icons/loader-circle";
+    import { folders } from "$lib/states/folders.svelte";
 
     type JobForm = {
         title: string;
@@ -71,7 +70,6 @@
     let validationErrors = $state<ValidationErrors>({});
     let error = $state<string | undefined>("");
     let initialized = $state(false);
-    let folders = $state<Folder[]>([]);
 
     let selectedFolder = $state<string | undefined>(undefined);
     let selectedMethod = $state<string>("0");
@@ -81,15 +79,13 @@
     const isUpdateForm: boolean = $derived(!isNaN(jobIdNum));
 
     async function loadDefaultForm() {
-        if (!jobId || initialized) return;
-        if (!isUpdateForm) return;
+        if (!jobIdNum || initialized) return;
+        if (!isUpdateForm || !activeJob.initialized) return;
 
         loading = true;
 
-        const resp: APIResponse<Job> = await loadJobById(jobIdNum);
-
-        if (resp.status === 200 && resp.data) {
-            const job = resp.data;
+        if (activeJob.job) {
+            const job = activeJob.job;
 
             formData = {
                 title: job.title,
@@ -115,10 +111,8 @@
             selectedMethod = String(job.method);
 
             initialized = true;
-        } else if (resp.status === 404) {
-            goto(resolve("/jobs"));
         } else {
-            error = resp.message;
+            goto(resolve("/jobs"));
         }
 
         loading = false;
@@ -185,20 +179,6 @@
     });
 
     $effect(() => {
-        if (!auth.initialized) return;
-        // Load folders on init
-        if (folders.length === 0) {
-            loadFolders().then((resp) => {
-                if (resp.status === 200 && resp.data) {
-                    folders = resp.data;
-                } else {
-                    LOGGER.error("Failed to load folders", resp.message);
-                }
-            });
-        }
-    });
-
-    $effect(() => {
         formData.method = Number(selectedMethod);
     });
 
@@ -258,19 +238,18 @@
             </div>
 
             <div class="space-y-2">
-                <Label for="folderId">Folder (Optional)</Label>
-                <Select.Root type="single" bind:value={selectedFolder}>
+                <Label for="folder_id">Folder (Optional)</Label>
+                <Select.Root name="folder_id" type="single" bind:value={selectedFolder}>
                     <Select.Trigger class="w-full">
                         {formData.folder_id
-                            ? (folders.find((f) => f.id === formData.folder_id)
-                                  ?.name ?? "Select folder")
+                            ? (folders.folders.get(formData.folder_id)?.name ?? "Select folder")
                             : "No folder"}
                     </Select.Trigger>
                     <Select.Content>
                         <Select.Item value="">No folder</Select.Item>
-                        {#each folders as folder (folder.id)}
-                            <Select.Item value={String(folder.id)}
-                                >{folder.name}</Select.Item
+                        {#each folders.folders.keys() as folderId (folderId)}
+                            <Select.Item value={String(folderId)}
+                                >{folders.folders.get(folderId)?.name}</Select.Item
                             >
                         {/each}
                     </Select.Content>
@@ -284,7 +263,7 @@
 
             <div class="space-y-2">
                 <Label for="method">HTTP Method</Label>
-                <Select.Root type="single" bind:value={selectedMethod}>
+                <Select.Root name="method" type="single" bind:value={selectedMethod}>
                     <Select.Trigger class="w-full">
                         {JOB_METHOD_MAP.get(formData.method) ?? "Select method"}
                     </Select.Trigger>
@@ -366,8 +345,9 @@
             </div>
 
             <div class="space-y-2">
-                <Label for="headers">HTTP Authentication</Label>
+                <Label for="auth">HTTP Authentication</Label>
                 <Input
+                    id="auth.username"
                     type="text"
                     name="auth.username"
                     placeholder="Username"
@@ -376,6 +356,7 @@
                 />
 
                 <Input
+                    id="auth.password"
                     type="password"
                     name="auth.password"
                     placeholder="Password"
@@ -395,7 +376,7 @@
                         class="my-auto"
                         bind:checked={formData.auth.enabled}
                     />
-                    <Label for="enabled">Enabled</Label>
+                    <Label for="auth.enabled">Enabled</Label>
                 </div>
             </div>
 

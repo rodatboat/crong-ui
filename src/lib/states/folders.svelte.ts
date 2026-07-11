@@ -27,6 +27,11 @@ class FolderState {
         
         this.initialized = true;
     }
+
+    updateFolders(folders: Folder[]) {
+        this.folders.clear();
+        this.folders = new Map(folders.map((folder) => [folder.id, folder]));
+    }
 }
 
 export const folders = new FolderState();

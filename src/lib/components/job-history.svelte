@@ -67,10 +67,8 @@
     }
 
     $effect(() => {
-        if (!auth.initialized || !jobIdNum) return;
+        if (!auth.initialized || !jobIdNum || !activeJob.initialized) return;
         loadJobHistory();
-        if (activeJob.initialized) return;
-        activeJob.initialize(jobIdNum);
     });
 </script>
 
