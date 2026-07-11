@@ -8,6 +8,7 @@
     import { LOGGER } from "$lib/logger";
     import { auth } from "$lib/auth/auth.svelte";
     import { loadJobExecutions } from "$lib/services/jobs";
+    import { activeJob } from "$lib/states/job.svelte";
 
     interface Props {
         jobId: string;
@@ -32,7 +33,7 @@
               ) : 0,
     );
 
-    async function load() {
+    async function loadJobHistory() {
         if (!jobId || !jobIdNum) return;
 
         loading = true;
@@ -66,8 +67,10 @@
     }
 
     $effect(() => {
-        if (!auth.initialized) return;
-        load();
+        if (!auth.initialized || !jobIdNum) return;
+        loadJobHistory();
+        if (activeJob.initialized) return;
+        activeJob.initialize(jobIdNum);
     });
 </script>
 
