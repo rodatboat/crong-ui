@@ -29,10 +29,11 @@
     import { goto } from "$app/navigation";
     import { resolve } from "$app/paths";
     import JobRunButton from "$lib/components/job-run-button.svelte";
-    import { JOB_METHOD_MAP } from "$lib/const";
+    import { JOB_METHOD_MAP, TIMEZONES } from "$lib/const";
     import { Separator } from "$lib/components/ui/separator";
     import LoaderIcon from "@lucide/svelte/icons/loader-circle";
     import { folders } from "$lib/states/folders.svelte";
+    import clsx from "clsx";
 
     type JobForm = {
         title: string;
@@ -240,7 +241,7 @@
             <div class="space-y-2">
                 <Label for="folder_id">Folder (Optional)</Label>
                 <Select.Root name="folder_id" type="single" bind:value={selectedFolder}>
-                    <Select.Trigger class="w-full">
+                    <Select.Trigger class="w-full hover:cursor-pointer">
                         {formData.folder_id
                             ? (folders.folders.get(formData.folder_id)?.name ?? "Select folder")
                             : "No folder"}
@@ -248,7 +249,7 @@
                     <Select.Content>
                         <Select.Item value="">No folder</Select.Item>
                         {#each folders.folders.keys() as folderId (folderId)}
-                            <Select.Item value={String(folderId)}
+                            <Select.Item value={String(folderId)} class="hover:cursor-pointer"
                                 >{folders.folders.get(folderId)?.name}</Select.Item
                             >
                         {/each}
@@ -264,12 +265,12 @@
             <div class="space-y-2">
                 <Label for="method">HTTP Method</Label>
                 <Select.Root name="method" type="single" bind:value={selectedMethod}>
-                    <Select.Trigger class="w-full">
+                    <Select.Trigger class="w-full hover:cursor-pointer">
                         {JOB_METHOD_MAP.get(formData.method) ?? "Select method"}
                     </Select.Trigger>
                     <Select.Content>
                         {#each Array.from(JOB_METHOD_MAP.entries()) as [key, value] (key)}
-                            <Select.Item value={String(key)}
+                            <Select.Item value={String(key)} class="hover:cursor-pointer"
                                 >{value}</Select.Item
                             >
                         {/each}
@@ -376,7 +377,7 @@
                         class="my-auto"
                         bind:checked={formData.auth.enabled}
                     />
-                    <Label for="auth.enabled">Enabled</Label>
+                    <Label for="auth.enabled">Auth Required</Label>
                 </div>
             </div>
 
@@ -397,13 +398,18 @@
 
             <div class="space-y-2">
                 <Label for="timezone">Timezone</Label>
-                <Input
-                    id="timezone"
-                    type="text"
-                    placeholder="UTC"
-                    bind:value={formData.timezone}
-                    required
-                />
+                <Select.Root name="timezone" type="single" bind:value={formData.timezone}>
+                    <Select.Trigger class="w-full hover:cursor-pointer">
+                        {formData.timezone ?? "Select timezone"}
+                    </Select.Trigger>
+                    <Select.Content class="max-h-72">
+                        {#each TIMEZONES as timezone (timezone)}
+                            <Select.Item value={timezone} class="hover:cursor-pointer"
+                                >{timezone}</Select.Item
+                            >
+                        {/each}
+                    </Select.Content>
+                </Select.Root>
                 {#if validationErrors.timezone}
                     <p class="text-destructive text-xs">
                         {validationErrors.timezone}
@@ -420,7 +426,10 @@
     <Card.Footer>
         <div class="flex flex-row w-full gap-2 text-center">
             <Button
-                class="w-[80%] hover:cursor-pointer"
+                class={clsx("hover:cursor-pointer",
+                    isUpdateForm ? "w-[80%]" : "w-full",
+
+                )}
                 disabled={loading}
                 onclick={isUpdateForm ? handleUpdateJob : handleCreateJob}
             >
