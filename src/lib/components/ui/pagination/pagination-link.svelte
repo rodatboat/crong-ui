@@ -29,7 +29,7 @@
 	data-size={size}
 	class={cn(
 		buttonVariants({ size, variant: isActive ? "outline" : "ghost" }),
-		"cn-pagination-link",
+		"cn-pagination-link hover:cursor-pointer",
 		className
 	)}
 	{...restProps}

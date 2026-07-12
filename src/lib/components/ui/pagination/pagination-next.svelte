@@ -16,7 +16,7 @@
 	aria-label="Go to next page"
 	class={cn(
 		buttonVariants({ variant: "ghost", size: "default" }),
-		"pr-1.5!",
+		"pr-1.5! hover:cursor-pointer",
 		className
 	)}
 	{...restProps}

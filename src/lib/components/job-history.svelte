@@ -9,6 +9,7 @@
     import { auth } from "$lib/auth/auth.svelte";
     import { loadJobExecutions } from "$lib/services/jobs";
     import { activeJob } from "$lib/states/job.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
 
     interface Props {
         jobId: string;
@@ -67,6 +68,46 @@
         goto(url.toString(), { invalidateAll: true });
     }
 
+    function formatExecutionTime(dateString: string | null | undefined): string {
+        if (!dateString) return '';
+
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const HOURS_48_IN_MS = 48 * 60 * 60 * 1000;
+
+        // If older than 48 hours, show normal date string
+        if (diffMs > HOURS_48_IN_MS) {
+            return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+            });
+        }
+
+        // Otherwise, show relative time with time
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+        const relativeTime = rtf.format(-diffDays, 'day');
+        const time = date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+        });
+
+        const humanReadableDate = `${relativeTime} at ${time}`;
+        return String(humanReadableDate).charAt(0).toUpperCase() + String(humanReadableDate).slice(1);
+    }
+
+    function isSuccessfulExecution(execution: JobExecution) {
+        return execution.status_code >= 200 && execution.status_code < 400;
+    }
+
     $effect(() => {
         if (!auth.initialized || !jobIdNum || !activeJob.initialized) return;
         loadJobHistory();
@@ -93,16 +134,22 @@
     {:else}
         <div class="space-y-4">
             {#each jobExecutions as execution (execution.id)}
-                <Card.Root>
-                    <Card.Header>
+                <Card.Root class="py-2">
+                    <Card.Header class="px-3 flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
                         <Card.Title>
-                            {new Date(
+                            {formatExecutionTime(
                                 execution.executed_at || execution.created_at,
-                            ).toLocaleString()}
+                            )}
                         </Card.Title>
-                        <Card.Description>
-                            Status: {execution.status_text} ({execution.status_code})
-                            • Duration: {execution.duration_ms}ms
+                        <Card.Description class="flex items-center gap-4">
+                            <span class={isSuccessfulExecution(execution) ? "text-primary" : "text-destructive"}>
+                                {execution.status_text}
+                            </span>
+                            <div class="min-w-10 max-w-10 text-center">
+                                {execution.duration_ms}ms
+                            </div>
+                            <!-- TODO: On click, show execution details (Headers, Body, Metrics, etc.) -->
+                            <Button variant="outline" size="xs" class="ml-auto hover:cursor-pointer">Details</Button>
                         </Card.Description>
                     </Card.Header>
                 </Card.Root>
