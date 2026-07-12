@@ -3,7 +3,7 @@
   import DashboardIcon from "@lucide/svelte/icons/layout-dashboard";
   import FolderIcon from "@lucide/svelte/icons/folder";
   import TimerIcon from "@lucide/svelte/icons/timer";
-  import SettingsIcon from "@lucide/svelte/icons/settings";
+  // import SettingsIcon from "@lucide/svelte/icons/settings";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 
   // Menu items.
@@ -47,7 +47,7 @@
               </Sidebar.MenuButton>
             </Sidebar.MenuItem>
           {/each}
-          <Sidebar.Separator class="mx-0" />
+          <!-- <Sidebar.Separator class="mx-0" />
           <Sidebar.MenuItem>
             <Sidebar.MenuButton class="text-base">
               {#snippet child({ props })}
@@ -57,7 +57,7 @@
                 </a>
               {/snippet}
             </Sidebar.MenuButton>
-          </Sidebar.MenuItem>
+          </Sidebar.MenuItem> -->
         </Sidebar.Menu>
       </Sidebar.GroupContent>
     </Sidebar.Group>

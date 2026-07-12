@@ -4,7 +4,7 @@
     import { Skeleton } from "$lib/components/ui/skeleton";
     import type { APIResponse, JobExecution } from "$lib/types";
     import { page } from "$app/state";
-    // import { goto } from "$app/navigation";
+    import { goto } from "$app/navigation";
     import { LOGGER } from "$lib/logger";
     import { auth } from "$lib/auth/auth.svelte";
     import { loadJobExecutions } from "$lib/services/jobs";
@@ -63,7 +63,8 @@
         const url = new URL(page.url);
         url.searchParams.set("page", String(newPage));
         url.searchParams.set("limit", String(limit));
-        // await goto(url.toString());
+        // eslint-disable-next-line svelte/no-navigation-without-resolve
+        goto(url.toString(), { invalidateAll: true });
     }
 
     $effect(() => {
@@ -107,7 +108,7 @@
                 </Card.Root>
             {/each}
 
-            <Pagination.Root count={totalCount} perPage={limit}>
+            <Pagination.Root count={totalCount} perPage={limit} page={pageNum}>
                 {#snippet children({ pages, currentPage: activePage })}
                     <Pagination.Content>
                         <Pagination.Item>
